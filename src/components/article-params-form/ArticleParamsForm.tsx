@@ -2,7 +2,7 @@ import { ArrowButton } from 'src/ui/arrow-button';
 import { Button } from 'src/ui/button';
 
 import styles from './ArticleParamsForm.module.scss';
-import { useState } from 'react';
+import { FormEvent, useState } from 'react';
 import clsx from 'clsx';
 import { Separator } from 'src/ui/separator';
 import { RadioGroup } from 'src/ui/radio-group';
@@ -17,7 +17,11 @@ import {
 import { Select } from 'src/ui/select';
 import { Text } from 'src/ui/text';
 
-export const ArticleParamsForm = () => {
+type ArticleParamsFormProps = {
+	onApply: (state: typeof defaultArticleState) => void;
+};
+
+export const ArticleParamsForm = ({ onApply }: ArticleParamsFormProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [fontSize, setFontSize] = useState(defaultArticleState.fontSizeOption);
 	const [fontFamily, setFontFamily] = useState(
@@ -29,12 +33,23 @@ export const ArticleParamsForm = () => {
 	);
 	const [width, setWidth] = useState(defaultArticleState.contentWidth);
 
+	const handleSubmit = (e: FormEvent) => {
+		e.preventDefault();
+		onApply({
+			fontFamilyOption: fontFamily,
+			fontSizeOption: fontSize,
+			fontColor: fontColor,
+			backgroundColor: backgroundColor,
+			contentWidth: width,
+		});
+	};
+
 	return (
 		<>
 			<ArrowButton isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
 			<aside
 				className={clsx(styles.container, { [styles.container_open]: isOpen })}>
-				<form className={styles.form}>
+				<form className={styles.form} onSubmit={handleSubmit}>
 					<Text
 						size={38}
 						weight={800}
