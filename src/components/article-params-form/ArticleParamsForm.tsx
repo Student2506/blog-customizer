@@ -2,7 +2,7 @@ import { ArrowButton } from 'src/ui/arrow-button';
 import { Button } from 'src/ui/button';
 
 import styles from './ArticleParamsForm.module.scss';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import { Separator } from 'src/ui/separator';
 import { RadioGroup } from 'src/ui/radio-group';
@@ -27,6 +27,7 @@ export const ArticleParamsForm = ({
 	onReset,
 }: ArticleParamsFormProps) => {
 	const [isOpen, setIsOpen] = useState(false);
+	const formRef = useRef<HTMLElement>(null);
 	const [fontSize, setFontSize] = useState(defaultArticleState.fontSizeOption);
 	const [fontFamily, setFontFamily] = useState(
 		defaultArticleState.fontFamilyOption
@@ -59,11 +60,25 @@ export const ArticleParamsForm = ({
 		onReset(defaultArticleState);
 	};
 
+	useEffect(() => {
+		if (!isOpen) return;
+		const clickOutside = (event: MouseEvent) => {
+			if (formRef.current && !formRef.current.contains(event.target as Node)) {
+				setIsOpen(false);
+			}
+		};
+		document.addEventListener('mousedown', clickOutside);
+		return () => {
+			document.removeEventListener('mousedown', clickOutside);
+		};
+	}, [isOpen]);
+
 	return (
 		<>
 			<ArrowButton isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
 			<aside
-				className={clsx(styles.container, { [styles.container_open]: isOpen })}>
+				className={clsx(styles.container, { [styles.container_open]: isOpen })}
+				ref={formRef}>
 				<form
 					className={styles.form}
 					onSubmit={handleSubmit}
