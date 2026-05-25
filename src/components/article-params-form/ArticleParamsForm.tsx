@@ -19,9 +19,13 @@ import { Text } from 'src/ui/text';
 
 type ArticleParamsFormProps = {
 	onApply: (state: typeof defaultArticleState) => void;
+	onReset: (state: typeof defaultArticleState) => void;
 };
 
-export const ArticleParamsForm = ({ onApply }: ArticleParamsFormProps) => {
+export const ArticleParamsForm = ({
+	onApply,
+	onReset,
+}: ArticleParamsFormProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const [fontSize, setFontSize] = useState(defaultArticleState.fontSizeOption);
 	const [fontFamily, setFontFamily] = useState(
@@ -42,6 +46,17 @@ export const ArticleParamsForm = ({ onApply }: ArticleParamsFormProps) => {
 			backgroundColor: backgroundColor,
 			contentWidth: width,
 		});
+		setIsOpen(false);
+	};
+
+	const handleReset = (e: FormEvent) => {
+		e.preventDefault();
+		setFontSize(defaultArticleState.fontSizeOption);
+		setFontFamily(defaultArticleState.fontFamilyOption);
+		setFontColor(defaultArticleState.fontColor);
+		setBackgroundColor(defaultArticleState.backgroundColor);
+		setWidth(defaultArticleState.contentWidth);
+		onReset(defaultArticleState);
 	};
 
 	return (
@@ -49,7 +64,10 @@ export const ArticleParamsForm = ({ onApply }: ArticleParamsFormProps) => {
 			<ArrowButton isOpen={isOpen} onClick={() => setIsOpen(!isOpen)} />
 			<aside
 				className={clsx(styles.container, { [styles.container_open]: isOpen })}>
-				<form className={styles.form} onSubmit={handleSubmit}>
+				<form
+					className={styles.form}
+					onSubmit={handleSubmit}
+					onReset={handleReset}>
 					<Text
 						size={38}
 						weight={800}
