@@ -7,12 +7,14 @@ import clsx from 'clsx';
 import { Separator } from 'src/ui/separator';
 import { RadioGroup } from 'src/ui/radio-group';
 import {
+	ArticleStateType,
 	backgroundColors,
 	contentWidthArr,
 	defaultArticleState,
 	fontColors,
 	fontFamilyOptions,
 	fontSizeOptions,
+	OptionType,
 } from 'src/constants/articleProps';
 import { Select } from 'src/ui/select';
 import { Text } from 'src/ui/text';
@@ -28,35 +30,26 @@ export const ArticleParamsForm = ({
 }: ArticleParamsFormProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const formRef = useRef<HTMLElement>(null);
-	const [fontSize, setFontSize] = useState(defaultArticleState.fontSizeOption);
-	const [fontFamily, setFontFamily] = useState(
-		defaultArticleState.fontFamilyOption
-	);
-	const [fontColor, setFontColor] = useState(defaultArticleState.fontColor);
-	const [backgroundColor, setBackgroundColor] = useState(
-		defaultArticleState.backgroundColor
-	);
-	const [width, setWidth] = useState(defaultArticleState.contentWidth);
+	const [formState, setFormState] =
+		useState<ArticleStateType>(defaultArticleState);
+	const updateFormField = (field: keyof ArticleStateType) => {
+		return (value: OptionType) => {
+			setFormState((prev) => ({
+				...prev,
+				[field]: value,
+			}));
+		};
+	};
 
 	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault();
-		onApply({
-			fontFamilyOption: fontFamily,
-			fontSizeOption: fontSize,
-			fontColor: fontColor,
-			backgroundColor: backgroundColor,
-			contentWidth: width,
-		});
+		onApply(formState);
 		setIsOpen(false);
 	};
 
 	const handleReset = (e: FormEvent) => {
 		e.preventDefault();
-		setFontSize(defaultArticleState.fontSizeOption);
-		setFontFamily(defaultArticleState.fontFamilyOption);
-		setFontColor(defaultArticleState.fontColor);
-		setBackgroundColor(defaultArticleState.backgroundColor);
-		setWidth(defaultArticleState.contentWidth);
+		setFormState(defaultArticleState);
 		onReset(defaultArticleState);
 	};
 
@@ -92,38 +85,35 @@ export const ArticleParamsForm = ({
 						Задайте параметры
 					</Text>
 					<Select
-						selected={fontFamily}
+						selected={formState.fontFamilyOption}
 						title='Шрифт'
-						onChange={setFontFamily}
+						onChange={updateFormField('fontFamilyOption')}
 						options={fontFamilyOptions}
-						placeholder='What is it?'
 					/>
 					<RadioGroup
-						selected={fontSize}
+						selected={formState.fontSizeOption}
 						name='fontSize'
-						onChange={setFontSize}
+						onChange={updateFormField('fontSizeOption')}
 						options={fontSizeOptions}
 						title='Размер шрифта'
 					/>
 					<Select
-						selected={fontColor}
+						selected={formState.fontColor}
 						title='Цвет шрифта'
-						onChange={setFontColor}
+						onChange={updateFormField('fontColor')}
 						options={fontColors}
-						placeholder='What is it?'
 					/>
 					<Separator />
 					<Select
-						selected={backgroundColor}
+						selected={formState.backgroundColor}
 						title='Цвет фона'
-						onChange={setBackgroundColor}
+						onChange={updateFormField('backgroundColor')}
 						options={backgroundColors}
-						placeholder='What is it?'
 					/>
 					<Select
-						selected={width}
+						selected={formState.contentWidth}
 						title='Ширина контента'
-						onChange={setWidth}
+						onChange={updateFormField('contentWidth')}
 						options={contentWidthArr}
 					/>
 					<div className={styles.bottomContainer}>
